@@ -8,19 +8,22 @@ namespace UnityEngine.EventSystems
     {
         [SerializeField]
         private int sortIndex;
-
+        PointerEventData data;
         int IGesture.SortIndex { get { return sortIndex; } }
 
         void IGesture.Init()
         {
         }
 
-        bool IGesture.Recognize(TouchEventData touchData)
+        void IGesture.SetData(TouchEventData[] touchData)
         {
-            if (touchData.inputCount != 2)
+        }
+
+        bool IGesture.Recognize(TouchEventData[] touchData)
+        {
+            if (TouchEventData.touchCount != 2)
                 return false;
 
-            //touchData.touchEventData[0]
 
             return true;
         }

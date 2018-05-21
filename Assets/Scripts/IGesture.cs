@@ -9,6 +9,9 @@ namespace UnityEngine.EventSystems
         int SortIndex { get; }
 
         void Init();
-        bool Recognize(TouchEventData touchData);
+
+        void SetData(TouchEventData[] touchData);
+
+        bool Recognize(TouchEventData[] touchData);
     }
 }

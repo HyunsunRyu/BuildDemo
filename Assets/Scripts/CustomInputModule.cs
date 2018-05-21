@@ -6,17 +6,11 @@ namespace UnityEngine.EventSystems
 {
     public class TouchEventData
     {
-        public int inputCount;
-        public PointerEventData[] touchEventData;
+        public static int touchCount = 0;
 
-        public TouchEventData(int maxTouchCount)
-        {
-            touchEventData = new PointerEventData[maxTouchCount];
-
-            //PointerEventData data;
-
-            //data.
-        }
+        public bool pressed;
+        public bool released;
+        public PointerEventData touchEventData;
     }
 
     public class CustomInputModule : StandaloneInputModule
@@ -27,7 +21,7 @@ namespace UnityEngine.EventSystems
 
         private List<IGesture> gestures;
 
-        private TouchEventData touchData;
+        private TouchEventData[] touchData;
 
         private System.Text.StringBuilder builder = new System.Text.StringBuilder();
 
@@ -35,7 +29,7 @@ namespace UnityEngine.EventSystems
         {
             base.Awake();
 
-            touchData = new TouchEventData(maxTouchCount);
+            touchData = new TouchEventData[maxTouchCount];
 
             gestures = new List<IGesture>();
         }
@@ -68,20 +62,24 @@ namespace UnityEngine.EventSystems
 
         public override void Process()
         {
-            base.Process();
-
+            //============ Custom IGesture's Module ============/
+            //0. 기본 데이터 세팅. 
             if (Application.isMobilePlatform)
                 SetTouchEventData();
             else
                 SetMouseEventData();
 
+            //1. 추가된 입력받을 IGesture의 데이터를 별도로 세팅한다. //
+            foreach (IGesture gesture in gestures)
+                gesture.SetData(touchData);
 
+            //2. 세팅된 데이터를 가지고 각자 제스쳐를 인지한다. //
             //if (RecognizeGestures())
             //    return;
 
-
-            //base.Process();
-            DebugData();
+            //============ Custom IGesture's Module ============/
+            base.Process();
+            //DebugData();
         }
 
         private void SetMouseEventData()
@@ -92,79 +90,90 @@ namespace UnityEngine.EventSystems
 
             if (pressed || pressing)
             {
-                touchData.inputCount = 1;
+                TouchEventData.touchCount = 1;
 
-                PointerEventData pointerData = GetMousePointerEventData().GetButtonState(PointerEventData.InputButton.Left).eventData.buttonData;
-
-                SetPointerEventData(pointerData, pressed, released);
-                
-                touchData.touchEventData[0] = pointerData;
+                touchData[0].pressed = pressed;
+                touchData[0].released = released;
+                touchData[0].touchEventData = GetMousePointerEventData().GetButtonState(PointerEventData.InputButton.Left).eventData.buttonData;
             }
             else
             {
-                touchData.inputCount = 0;
+                TouchEventData.touchCount = 0;
             }
         }
 
         private void SetTouchEventData()
         {
-            touchData.inputCount = input.touchCount;
+            TouchEventData.touchCount = input.touchCount;
 
-            for (int i = 0; i < touchData.inputCount; i++)
+            for (int i = 0; i < input.touchCount; i++)
             {
                 //pressed, released 는 첫 동작 그 순간에만 true. 나머지는 false.
                 bool pressed, released;
                 PointerEventData data = GetTouchPointerEventData(input.GetTouch(i), out pressed, out released);
 
-                //SetPointerEventData(data, pressed, released);
+                touchData[i].pressed = pressed;
+                touchData[i].released = released;
+                touchData[i].touchEventData = data;
 
-                touchData.touchEventData[i] = data;
+                //IBeginDragHandler tester;
+
+                //ExecuteEvents.Execute(gameObject, data, tester.OnBeginDrag);
             }
         }
 
-        private void SetPointerEventData(PointerEventData data, bool pressed, bool released)
+        private void Test()
         {
-            if (pressed)
-            {
-                data.eligibleForClick = true;
-                data.delta = Vector2.zero;
-                data.pressPosition = data.position;
-                data.pointerPressRaycast = data.pointerCurrentRaycast;
+            eventSystem.SetSelectedGameObject
 
-                //if (data.pointerEnter != data.pointerCurrentRaycast.gameObject)
-                //{
-                //    data.pointerEnter = data.pointerCurrentRaycast.gameObject;
-                //}
-                data.pointerEnter = data.pointerCurrentRaycast.gameObject;
+            ////IEventSystemEndler
 
-                //ExecuteEvents.
+            //public static EventFunction<IBeginDragHandler> beginDragHandler { get; }
+            //public static EventFunction<ICancelHandler> cancelHandler { get; }
+            //public static EventFunction<IDeselectHandler> deselectHandler { get; }
+            //public static EventFunction<IDropHandler> dropHandler { get; }
+            //public static EventFunction<IDragHandler> dragHandler { get; }
+            //public static EventFunction<IEndDragHandler> endDragHandler { get; }
+            //public static EventFunction<IInitializePotentialDragHandler> initializePotentialDrag { get; }
+            //public static EventFunction<IMoveHandler> moveHandler { get; }
+            //public static EventFunction<IPointerClickHandler> pointerClickHandler { get; }
+            //public static EventFunction<IPointerDownHandler> pointerDownHandler { get; }
+            //public static EventFunction<IPointerEnterHandler> pointerEnterHandler { get; }
+            //public static EventFunction<IPointerExitHandler> pointerExitHandler { get; }
+            //public static EventFunction<IPointerUpHandler> pointerUpHandler { get; }
+            //public static EventFunction<IScrollHandler> scrollHandler { get; }
+            //public static EventFunction<ISelectHandler> selectHandler { get; }
+            //public static EventFunction<ISubmitHandler> submitHandler { get; }
+            //public static EventFunction<IUpdateSelectedHandler> updateSelectedHandler { get; }
 
-                /*
-                 * * //IEventSystemEndler
-                 * 
-                 * public static EventFunction<IBeginDragHandler> beginDragHandler { get; }
-                 * public static EventFunction<ICancelHandler> cancelHandler { get; }
-                 * public static EventFunction<IDeselectHandler> deselectHandler { get; }
-                 * public static EventFunction<IDropHandler> dropHandler { get; }
-                 * public static EventFunction<IDragHandler> dragHandler { get; }
-                 * public static EventFunction<IEndDragHandler> endDragHandler { get; }
-                 * public static EventFunction<IInitializePotentialDragHandler> initializePotentialDrag { get; }
-                 * public static EventFunction<IMoveHandler> moveHandler { get; }
-                 * public static EventFunction<IPointerClickHandler> pointerClickHandler { get; }
-                 * public static EventFunction<IPointerDownHandler> pointerDownHandler { get; }
-                 * public static EventFunction<IPointerEnterHandler> pointerEnterHandler { get; }
-                 * public static EventFunction<IPointerExitHandler> pointerExitHandler { get; }
-                 * public static EventFunction<IPointerUpHandler> pointerUpHandler { get; }
-                 * public static EventFunction<IScrollHandler> scrollHandler { get; }
-                 * public static EventFunction<ISelectHandler> selectHandler { get; }
-                 * public static EventFunction<ISubmitHandler> submitHandler { get; }
-                 * public static EventFunction<IUpdateSelectedHandler> updateSelectedHandler { get; }
-                 */
-            }
+            //Drag
+            //IBeginDragHandler
+            //IDragHandler
+            //IEndDragHandler
+            //IInitializePotentialDragHandler
+            //IDropHandler
 
-            if (released)
-            {
-            }
+            //Pointer
+            //IPointerClickHandler
+            //IPointerDownHandler
+            //IPointerEnterHandler
+            //IPointerExitHandler
+            //IPointerUpHandler
+
+            //Select
+            //IDeselectHandler
+            //ISelectHandler
+            //IUpdateSelectedHandler
+
+            //for UI
+            //ISubmitHandler
+            //ICancelHandler
+
+            //Key
+            //IMoveHandler
+
+            //Mouse
+            //IScrollHandler
         }
 
         private bool RecognizeGestures()
@@ -208,9 +217,9 @@ namespace UnityEngine.EventSystems
             }
 
             return;
-            if (touchData.inputCount > 0)
+            if (TouchEventData.touchCount > 0)
             {
-                PointerEventData data = touchData.touchEventData[touchData.inputCount - 1];
+                PointerEventData data = touchData[TouchEventData.touchCount - 1].touchEventData;
 
                 builder.Length = 0;
 
