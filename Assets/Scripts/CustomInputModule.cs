@@ -2,6 +2,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+//https://gist.github.com/stramit/b654082eb226492d9a04
+
 namespace UnityEngine.EventSystems
 {
     public class TouchEventData
@@ -124,8 +126,6 @@ namespace UnityEngine.EventSystems
 
         private void Test()
         {
-            eventSystem.SetSelectedGameObject
-
             ////IEventSystemEndler
 
             //public static EventFunction<IBeginDragHandler> beginDragHandler { get; }
