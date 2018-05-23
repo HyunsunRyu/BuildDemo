@@ -4,28 +4,44 @@ using UnityEngine;
 
 namespace UnityEngine.EventSystems
 {
-    public class PinchGesture : MonoBehaviour, IGesture
+    public interface IPinchStartHandler : IEventSystemHandler
     {
-        [SerializeField]
-        private int sortIndex;
-        PointerEventData data;
-        int IGesture.SortIndex { get { return sortIndex; } }
+        void OnPinchStart(Vector2 point);
+    }
 
-        void IGesture.Init()
+    public interface IPinchHandler : IEventSystemHandler
+    {
+        void OnPinch(Vector2 point, float delta);
+    }
+
+    public interface IPinchEndHandler : IEventSystemHandler
+    {
+        void OnPinchEnd(Vector2 point);
+    }
+
+    public class PinchGesture : Gesture
+    {
+        public override void Init()
         {
+            //public static EventFunction<IUpdateSelectedHandler> updateSelectedHandler { get; }
+            //ExecuteEvents.Execute<IPinchStartHandler>(gameObject, )
+
         }
 
-        void IGesture.SetData(TouchEventData[] touchData)
+        public override void ConvertTouchData()
         {
+            if (touchCount != 2)
+                return;
+
+            
         }
 
-        bool IGesture.Recognize(TouchEventData[] touchData)
+        public override bool Recognize()
         {
-            if (TouchEventData.touchCount != 2)
+            if (touchCount != 2)
                 return false;
 
-
-            return true;
+            return false;
         }
     }
 }

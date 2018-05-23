@@ -5,7 +5,7 @@ using UnityEditor;
 namespace UnityEngine.EventSystems
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(CustomInputModule))]
+    [CustomEditor(typeof(GestureInputModule))]
     public class CustomInputModuleEditor : Editor
     {
         SerializedProperty maxTouchCount;

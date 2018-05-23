@@ -6,24 +6,13 @@ using System.Collections.Generic;
 
 namespace UnityEngine.EventSystems
 {
-    public class TouchEventData
-    {
-        public static int touchCount = 0;
-
-        public bool pressed;
-        public bool released;
-        public PointerEventData touchEventData;
-    }
-
-    public class CustomInputModule : StandaloneInputModule
+    public class GestureInputModule : StandaloneInputModule
     {
         [SerializeField]
         [Range(2, 10)]
-        private int maxTouchCount = 0;
+        private int maxTouchCount = 2;
 
-        private List<IGesture> gestures;
-
-        private TouchEventData[] touchData;
+        private List<Gesture> gestures;
 
         private System.Text.StringBuilder builder = new System.Text.StringBuilder();
 
@@ -31,9 +20,7 @@ namespace UnityEngine.EventSystems
         {
             base.Awake();
 
-            touchData = new TouchEventData[maxTouchCount];
-
-            gestures = new List<IGesture>();
+            gestures = new List<Gesture>();
         }
 
         public override void ActivateModule()
@@ -47,14 +34,14 @@ namespace UnityEngine.EventSystems
         {
             gestures.Clear();
 
-            foreach (IGesture gesture in transform.GetComponentsInChildren<IGesture>(true))
+            foreach (Gesture gesture in transform.GetComponentsInChildren<Gesture>(true))
             {
                 gestures.Add(gesture);
 
                 gesture.Init();
             }
 
-            gestures.Sort((a, b) => a.SortIndex.CompareTo(b.SortIndex));
+            gestures.Sort((a, b) => a.GetSortIndex().CompareTo(b.GetSortIndex()));
         }
 
         public override void DeactivateModule()
@@ -71,17 +58,18 @@ namespace UnityEngine.EventSystems
             else
                 SetMouseEventData();
 
-            //1. 추가된 입력받을 IGesture의 데이터를 별도로 세팅한다. //
-            foreach (IGesture gesture in gestures)
-                gesture.SetData(touchData);
+            foreach (Gesture gesture in gestures)
+            {
+                //1. 추가된 입력받을 IGesture의 데이터를 별도로 세팅한다. //
+                gesture.ConvertTouchData();
 
-            //2. 세팅된 데이터를 가지고 각자 제스쳐를 인지한다. //
-            //if (RecognizeGestures())
-            //    return;
+                //2. 세팅된 데이터를 가지고 각자 제스쳐를 인지한다. //
+                if (gesture.Recognize())
+                    return;
+            }
 
             //============ Custom IGesture's Module ============/
             base.Process();
-            //DebugData();
         }
 
         private void SetMouseEventData()
@@ -90,23 +78,20 @@ namespace UnityEngine.EventSystems
             bool released = input.GetMouseButtonUp(0);
             bool pressing = input.GetMouseButton(0);
 
-            if (pressed || pressing)
+            if (pressed || pressing || released)
             {
-                TouchEventData.touchCount = 1;
-
-                touchData[0].pressed = pressed;
-                touchData[0].released = released;
-                touchData[0].touchEventData = GetMousePointerEventData().GetButtonState(PointerEventData.InputButton.Left).eventData.buttonData;
+                Gesture.SetTouchCount(1);
+                Gesture.SetData(0, pressed, released, GetMousePointerEventData().GetButtonState(PointerEventData.InputButton.Left).eventData.buttonData);
             }
             else
             {
-                TouchEventData.touchCount = 0;
+                Gesture.SetTouchCount(0);
             }
         }
 
         private void SetTouchEventData()
         {
-            TouchEventData.touchCount = input.touchCount;
+            Gesture.SetTouchCount(input.touchCount);
 
             for (int i = 0; i < input.touchCount; i++)
             {
@@ -114,13 +99,9 @@ namespace UnityEngine.EventSystems
                 bool pressed, released;
                 PointerEventData data = GetTouchPointerEventData(input.GetTouch(i), out pressed, out released);
 
-                touchData[i].pressed = pressed;
-                touchData[i].released = released;
-                touchData[i].touchEventData = data;
+                Gesture.SetData(i, pressed, released, data);
 
-                //IBeginDragHandler tester;
-
-                //ExecuteEvents.Execute(gameObject, data, tester.OnBeginDrag);
+                
             }
         }
 
@@ -176,16 +157,6 @@ namespace UnityEngine.EventSystems
             //IScrollHandler
         }
 
-        private bool RecognizeGestures()
-        {
-            foreach (IGesture gesture in gestures)
-            {
-                if (gesture.Recognize(touchData))
-                    return true;
-            }
-            return false;
-        }
-
         private string GetValue<T>(T obj) where T : Object
         {
             if (obj == null)
@@ -217,9 +188,9 @@ namespace UnityEngine.EventSystems
             }
 
             return;
-            if (TouchEventData.touchCount > 0)
+            if (input.touchCount > 0)
             {
-                PointerEventData data = touchData[TouchEventData.touchCount - 1].touchEventData;
+                //PointerEventData data = touchData[TouchEventData.touchCount - 1].touchEventData;
 
                 builder.Length = 0;
 
