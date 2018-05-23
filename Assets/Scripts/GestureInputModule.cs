@@ -52,7 +52,7 @@ namespace UnityEngine.EventSystems
         public override void Process()
         {
             //============ Custom IGesture's Module ============/
-            //0. 기본 데이터 세팅. 
+            //1. 기본 데이터 세팅. 
             if (Application.isMobilePlatform)
                 SetTouchEventData();
             else
@@ -60,10 +60,7 @@ namespace UnityEngine.EventSystems
 
             foreach (Gesture gesture in gestures)
             {
-                //1. 추가된 입력받을 IGesture의 데이터를 별도로 세팅한다. //
-                gesture.ConvertTouchData();
-
-                //2. 세팅된 데이터를 가지고 각자 제스쳐를 인지한다. //
+                //2. 개별로 데이터를 세팅하고 각자 제스쳐를 인지한다. //
                 if (gesture.Recognize())
                     return;
             }

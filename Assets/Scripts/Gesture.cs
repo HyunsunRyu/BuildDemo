@@ -40,8 +40,6 @@ namespace UnityEngine.EventSystems
 
         public abstract void Init();
 
-        public abstract void ConvertTouchData();
-
         public abstract bool Recognize();
 
         public int GetSortIndex() { return sortIndex; }
