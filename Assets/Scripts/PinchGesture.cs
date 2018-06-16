@@ -77,7 +77,6 @@ namespace UnityEngine.EventSystems
             }
 
             Pinch();
-
             return true;
         }
 

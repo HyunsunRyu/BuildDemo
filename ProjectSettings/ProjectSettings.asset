@@ -8,7 +8,7 @@ PlayerSettings:
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
-  defaultScreenOrientation: 4
+  defaultScreenOrientation: 0
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
@@ -241,7 +241,7 @@ PlayerSettings:
   AndroidTargetArchitectures: 5
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: D:/TestProjects/key.keystore
+  AndroidKeystoreName: D:/Unity/key.keystore
   AndroidKeyaliasName: key
   AndroidTVCompatibility: 1
   AndroidIsGame: 1
@@ -681,9 +681,9 @@ PlayerSettings:
     UNet: 1
   facebookSdkVersion: 7.9.4
   apiCompatibilityLevel: 2
-  cloudProjectId: 1b4e3111-7d1f-4143-a063-eb9081a5a81e
-  projectName: BuildDemo
-  organizationId: lovedangyou-naver-com
+  cloudProjectId: 9ec4624e-c628-4e14-be85-f4b2a6c24da6
+  projectName: BuildDemo (1)
+  organizationId: hyunsunryu
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
