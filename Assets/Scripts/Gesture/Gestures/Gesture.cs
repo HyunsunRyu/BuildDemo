@@ -10,7 +10,7 @@ namespace UnityEngine.EventSystems
 
         protected static int touchCount;
 
-        protected static PointerEventData[] pointerEventData;
+        protected static Vector2[] touchPosition;
         protected static bool[] pressed;
         protected static bool[] released;
 
@@ -18,7 +18,7 @@ namespace UnityEngine.EventSystems
 
         static Gesture()
         {
-            pointerEventData = new PointerEventData[maxTouchCount];
+            touchPosition = new Vector2[maxTouchCount];
             pressed = new bool[maxTouchCount];
             released = new bool[maxTouchCount];
         }
@@ -28,12 +28,12 @@ namespace UnityEngine.EventSystems
             touchCount = Mathf.Min(count, maxTouchCount);
         }
 
-        public static void SetData(int idx, bool pressed, bool released, PointerEventData pointerEventData)
+        public static void SetData(int idx, bool pressed, bool released, Vector2 touchPosition)
         {
             if (idx >= maxTouchCount)
                 return;
 
-            Gesture.pointerEventData[idx] = pointerEventData;
+            Gesture.touchPosition[idx] = touchPosition;
             Gesture.pressed[idx] = pressed;
             Gesture.released[idx] = released;
         }

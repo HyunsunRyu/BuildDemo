@@ -8,10 +8,6 @@ namespace UnityEngine.EventSystems
 {
     public class GestureInputModule : StandaloneInputModule
     {
-        [SerializeField]
-        [Range(2, 10)]
-        private int maxTouchCount = 2;
-
         private List<Gesture> gestures;
 
         private System.Text.StringBuilder builder = new System.Text.StringBuilder();
@@ -74,7 +70,23 @@ namespace UnityEngine.EventSystems
             if (pressed || pressing || released)
             {
                 Gesture.SetTouchCount(1);
-                Gesture.SetData(0, pressed, released, GetMousePointerEventData().GetButtonState(PointerEventData.InputButton.Left).eventData.buttonData);
+                Gesture.SetData(0, pressed, released, GetMousePointerEventData().GetButtonState(PointerEventData.InputButton.Left).eventData.buttonData.position);
+
+                if (Input.GetKeyDown(KeyCode.LeftControl))
+                {
+                    Gesture.SetTouchCount(2);
+                    Gesture.SetData(1, true, false, Vector2.zero);
+                }
+                else if (Input.GetKeyUp(KeyCode.LeftControl))
+                {
+                    Gesture.SetTouchCount(2);
+                    Gesture.SetData(1, false, true, Vector2.zero);
+                }
+                else if (Input.GetKey(KeyCode.LeftControl))
+                {
+                    Gesture.SetTouchCount(2);
+                    Gesture.SetData(1, false, false, Vector2.zero);
+                }
             }
             else
             {
@@ -92,7 +104,7 @@ namespace UnityEngine.EventSystems
                 bool pressed, released;
                 PointerEventData data = GetTouchPointerEventData(input.GetTouch(i), out pressed, out released);
 
-                Gesture.SetData(i, pressed, released, data);
+                Gesture.SetData(i, pressed, released, data.position);
             }
         }
 

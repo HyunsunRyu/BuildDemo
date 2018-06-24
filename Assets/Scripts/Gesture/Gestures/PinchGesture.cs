@@ -4,39 +4,32 @@ using UnityEngine;
 
 namespace UnityEngine.EventSystems
 {
-    public interface IPinchStartHandler : IEventSystemHandler
+    public interface IPinchStartGesture : IEventSystemHandler
     {
-        void OnPinchStart(Vector2 point);
+        void OnPinchStart(PinchGesture gesture);
     }
 
-    public interface IPinchHandler : IEventSystemHandler
+    public interface IPinchGesture : IEventSystemHandler
     {
-        void OnPinch(Vector2 point, float delta);
+        void OnPinch(PinchGesture gesture);
     }
 
-    public interface IPinchEndHandler : IEventSystemHandler
+    public interface IPinchEndGesture : IEventSystemHandler
     {
-        void OnPinchEnd(Vector2 point);
-    }
-
-    public class PinchData
-    {
-
+        void OnPinchEnd(PinchGesture gesture);
     }
 
     public class PinchGesture : Gesture
     {
-        [SerializeField] private float minPinchDistance = 50f;
+        //[SerializeField] private float minPinchDistance = 50f;
 
         private bool bPinch;
         private Vector2 firFingerPos;
         private Vector2 secFingerPos;
         private float distance;
-        private float firstDistance;
 
         public Vector2 centerPos { get; private set; }
         public float delta { get; private set; }
-        public float rateDelta { get; private set; }
 
         public override void Init()
         {
@@ -63,10 +56,10 @@ namespace UnityEngine.EventSystems
                 return false;
             }
 
-            centerPos = (pointerEventData[0].position + pointerEventData[1].position) * 0.5f;
+            centerPos = (touchPosition[0] + touchPosition[1]) * 0.5f;
 
-            firFingerPos = pointerEventData[0].position;
-            secFingerPos = pointerEventData[1].position;
+            firFingerPos = touchPosition[0];
+            secFingerPos = touchPosition[1];
 
             float nowDistance = Vector2.Distance(firFingerPos, secFingerPos);
 
@@ -77,7 +70,6 @@ namespace UnityEngine.EventSystems
             {
                 bPinch = true;
                 delta = 0f;
-                firstDistance = distance;
                 PinchStart();
             }
 
@@ -87,25 +79,25 @@ namespace UnityEngine.EventSystems
 
         private void PinchStart()
         {
-            foreach (IPinchStartHandler handler in GestureEventHandler<IPinchStartHandler>.GetHandlers())
+            foreach (IPinchStartGesture gesture in GestureEventHandler<IPinchStartGesture>.GetHandlers())
             {
-                handler.OnPinchStart(centerPos);
+                gesture.OnPinchStart(this);
             }
         }
 
         private void Pinch()
         {
-            foreach (IPinchHandler handler in GestureEventHandler<IPinchHandler>.GetHandlers())
+            foreach (IPinchGesture gesture in GestureEventHandler<IPinchGesture>.GetHandlers())
             {
-                handler.OnPinch(centerPos, delta);
+                gesture.OnPinch(this);
             }
         }
 
         private void PinchEnd()
         {
-            foreach (IPinchEndHandler handler in GestureEventHandler<IPinchEndHandler>.GetHandlers())
+            foreach (IPinchEndGesture gesture in GestureEventHandler<IPinchEndGesture>.GetHandlers())
             {
-                handler.OnPinchEnd(centerPos);
+                gesture.OnPinchEnd(this);
             }
         }
     }
